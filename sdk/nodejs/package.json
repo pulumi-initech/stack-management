@@ -1,19 +1,24 @@
 {
-    "name": "@pulumi/xyz",
+    "name": "@initech/stack-management",
     "version": "${VERSION}",
     "scripts": {
         "build": "tsc"
     },
     "dependencies": {
-        "@pulumi/aws": "^4.0.0"
+        "@pulumi/command": "^0.10.0",
+        "@pulumi/pulumi": "^3.0.0",
+        "@pulumi/pulumiservice": "^0.20.2",
+        "@types/node-fetch": "^2.6.2",
+        "node-fetch": "^2.6.2"
     },
     "devDependencies": {
+        "@types/node": "^10.0.0",
+        "pkg": "^5.6.0",
         "typescript": "^4.6.3"
     },
-    "peerDependencies": {
-        "@pulumi/pulumi": "latest"
-    },
     "pulumi": {
-        "resource": true
+        "resource": true,
+        "name": "stack-management",
+        "server": "github://api.github.com/pulumi-initech/stack-management"
     }
 }

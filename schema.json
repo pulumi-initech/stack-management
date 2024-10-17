@@ -1,59 +1,79 @@
 {
-    "name": "xyz",
+    "name": "stack-management",
+    "pluginDownloadURL": "github://api.github.com/pulumi-initech/stack-management",
     "resources": {
-        "xyz:index:StaticPage": {
+        "stack-management:index:StackSettings": {
             "isComponent": true,
             "inputProperties": {
-                "indexContent": {
+                "ttlTime": {
+                    "type": "number",
+                    "description": "Time to live time setting."
+                },
+                "driftManagement": {
                     "type": "string",
-                    "description": "The HTML content for index.html."
+                    "description": "Drift management setting for refresh or correction."
+                },
+                "teamAssignment": {
+                    "type": "string",
+                    "description": "Team to which the stack should be assigned."
+                },
+                "pulumiAccessToken": {
+                    "type": "string",
+                    "description": "Pulumi access token to set up as a deployment environment variable if provided."
+                },
+                "stackOutputs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "A list of output properties to expose via ESC pulumi-stacks"
                 }
             },
             "requiredInputs": [
-                "indexContent"
             ],
             "properties": {
-                "bucket": {
-                    "$ref": "/aws/v4.0.0/schema.json#/resources/aws:s3%2Fbucket:Bucket",
-                    "description": "The bucket resource."
-                },
-                "websiteUrl": {
-                    "type": "string",
-                    "description": "The website URL."
-                }
             },
             "required": [
-                "bucket",
-                "websiteUrl"
             ]
         }
     },
     "language": {
         "csharp": {
+            "rootNamespace": "Initech",
             "packageReferences": {
                 "Pulumi": "3.*",
-                "Pulumi.Aws": "5.*"
+                "Pulumi.PulumiService": "0.*",
+                "Pulumi.Command": "0.*"
             },
             "respectSchemaVersion": true
         },
         "go": {
             "generateResourceContainerTypes": true,
-            "importBasePath": "github.com/pulumi/pulumi-xyz/sdk/go/xyz",
+            "importBasePath": "github.com/pulumi-initech/stack-management/sdk/go/stack-management",
             "respectSchemaVersion": true
         },
         "nodejs": {
+            "packageName": "@initech/stack-management",
             "dependencies": {
-                "@pulumi/aws": "^5.0.0"
+                "@pulumi/pulumi": "^3.0.0",
+                "@pulumi/pulumiservice": "^0.20.2",
+                "@pulumi/command": "^0.10.0",
+                "@types/node-fetch": "^2.6.2",
+                "node-fetch": "^2.6.2"
             },
             "devDependencies": {
+                "@types/node": "^10.0.0",
+                "pkg": "^5.6.0",
                 "typescript": "^4.6.3"
             },
             "respectSchemaVersion": true
         },
         "python": {
+            "packageName": "initech_stack_management",
             "requires": {
                 "pulumi": ">=3.0.0,<4.0.0",
-                "pulumi-aws": ">=5.0.0,<6.0.0"
+                "pulumi-pulumiservice": ">=0.0.0,<1.0.0",
+                "pulumi-command": ">=0.0.0,<1.0.0"
             },
             "respectSchemaVersion": true
         }
