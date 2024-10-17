@@ -61,7 +61,7 @@ jobs:
       fail-fast: true
       matrix:
         nodeversion:
-          - 21.x
+          - 22.x
   publish_sdk:
     name: Publish SDKs
     runs-on: ubuntu-latest
@@ -139,6 +139,6 @@ jobs:
           - dotnet
           - go
         nodeversion:
-          - 21.x
+          - 22.x
         pythonversion:
           - "3.9"
