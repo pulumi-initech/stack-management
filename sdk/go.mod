@@ -1,4 +1,4 @@
-module github.com/pulumi-initech/initech-mlc-stackmgmt
+module github.com/pulumi-initech/stack-management
 
 go 1.21
 

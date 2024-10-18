@@ -9,7 +9,8 @@ permissions:
   actions: write
   checks: write
   packages: write
-
+  contents: write
+  
 env:
   PROVIDER: "stack-management"
   # THIS GITHUB_TOKEN IS A REQUIREMENT TO BE ABLE TO WRITE TO GH RELEASES

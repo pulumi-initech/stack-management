@@ -1,4 +1,4 @@
-module github.com/pulumi-initech/initech-stackmgmt/provider
+module github.com/pulumi-initech/stack-management/provider
 
 go 1.21
 
