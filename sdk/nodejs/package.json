@@ -1,5 +1,5 @@
 {
-    "name": "@initech/stack-management",
+    "name": "@pulumi-initech/stack-management",
     "version": "${VERSION}",
     "scripts": {
         "build": "tsc"

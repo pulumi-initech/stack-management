@@ -53,7 +53,7 @@
             "respectSchemaVersion": true
         },
         "nodejs": {
-            "packageName": "@initech/stack-management",
+            "packageName": "@pulumi-initech/stack-management",
             "dependencies": {
                 "@pulumi/pulumi": "^3.0.0",
                 "@pulumi/pulumiservice": "^0.20.2",
