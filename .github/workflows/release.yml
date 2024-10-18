@@ -8,14 +8,7 @@ on:
 permissions:
   actions: write
   checks: write
-  contents: read
-  deployments: read
-  id-token: read
   packages: write
-  pull-requests: read
-  repository-projects: read
-  security-events: read
-  statuses: read
 
 env:
   PROVIDER: "stack-management"
