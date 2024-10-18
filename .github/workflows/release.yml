@@ -4,6 +4,19 @@ on:
     tags:
       - v*.*.*
       - '!v*.*.*-**'
+
+permissions:
+  actions: write
+  checks: write
+  contents: read
+  deployments: read
+  id-token: read
+  packages: write
+  pull-requests: read
+  repository-projects: read
+  security-events: read
+  statuses: read
+
 env:
   PROVIDER: "stack-management"
   # THIS GITHUB_TOKEN IS A REQUIREMENT TO BE ABLE TO WRITE TO GH RELEASES
@@ -25,6 +38,7 @@ env:
   PYPI_USERNAME: ""
   PYPI_REPOSITORY_URL: ""
   PUBLISH_PYPI: false
+
 jobs:
   publish_binary:
     name: publish
