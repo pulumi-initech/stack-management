@@ -16,8 +16,6 @@ import * as pulumi from "@pulumi/pulumi";
 import * as provider from "@pulumi/pulumi/provider";
 import { StackSettings, StackSettingsArgs } from "./stackSettings"
 
-import { StaticPage, StaticPageArgs } from "./staticPage";
-
 export class Provider implements provider.Provider {
     constructor(readonly version: string, readonly schema: string) { }
 
