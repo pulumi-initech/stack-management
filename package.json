@@ -1,5 +1,4 @@
 {
-  "version": "0.0.12",
   "devDependencies": {
     "@types/node-fetch": "^2.6.11",
     "@vercel/ncc": "^0.28.6",
