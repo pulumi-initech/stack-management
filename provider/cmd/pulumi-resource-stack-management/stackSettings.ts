@@ -10,7 +10,6 @@ export interface StackSettingsArgs{
   driftManagement?: string,
   deleteStack?: string,
   teamAssignment?: string, 
-  pulumiAccessToken?: pulumi.Output<string>,
   outputKeys?: string[],
   stackTags?: string[],
 }
