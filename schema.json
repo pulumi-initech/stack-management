@@ -27,6 +27,13 @@
                         "type": "string"
                     },
                     "description": "A list of output properties to expose via ESC pulumi-stacks"
+                },
+                "stackTags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "A list of tags to add to the stack"           
                 }
             },
             "requiredInputs": [

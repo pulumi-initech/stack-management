@@ -10,7 +10,7 @@ export interface StackSettingsArgs{
   driftManagement?: string,
   deleteStack?: string,
   teamAssignment?: string, 
-  outputKeys?: string[],
+  stackOuputs?: string[],
   stackTags?: string[],
 }
 
@@ -18,7 +18,7 @@ export interface StackSettingsArgs{
 export class StackSettings extends pulumi.ComponentResource {
 
   constructor(name: string, args: StackSettingsArgs, opts?: pulumi.ComponentResourceOptions) {
-    super("pulumi:stackmgmt:stacksettings", name, args, opts);
+    super("pulumi-initech:stack-management:stacksettings", name, args, opts);
 
     // Settings used below
     const npwStack = "dev" // This is the stack that NPW creates initially.
@@ -155,8 +155,8 @@ export class StackSettings extends pulumi.ComponentResource {
 
 
     //// ESC Output advertisement 
-    if (args.outputKeys) {
-      const yaml = args.outputKeys!.map(item => ` .   ${item}: \${stackRef.${stack}.${item}}`).join('\n');
+    if (args.stackOuputs) {
+      const yaml = args.stackOuputs!.map(item => ` .   ${item}: \${stackRef.${stack}.${item}}`).join('\n');
 
       const esc = new pulumiservice.Environment(`${name}-stack-env`, {
         name: `${stack}-outputs`,
