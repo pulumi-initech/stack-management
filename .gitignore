@@ -1,6 +1,7 @@
 .pulumi
 **/bin/
 **/obj/
+**/sdk/
 **/node_modules/
 vendor/
 **/Pulumi.*.yaml

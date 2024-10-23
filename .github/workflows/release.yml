@@ -6,8 +6,6 @@ on:
       - '!v*.*.*-**'
 
 permissions:
-  actions: write
-  checks: write
   packages: write
   contents: write
   
