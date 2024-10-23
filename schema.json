@@ -1,5 +1,6 @@
 {
     "name": "stack-management",
+    "pluginDownloadURL": "github://api.github.com/pulumi-initech/stack-management",
     "resources": {
         "stack-management:index:StackSettings": {
             "isComponent": true,
