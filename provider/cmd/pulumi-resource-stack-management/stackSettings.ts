@@ -193,8 +193,7 @@ export class StackSettings extends pulumi.ComponentResource {
         name: `${stack}-outputs`,
         project: project,
         organization: org,
-        yaml: new pulumi.asset.StringAsset(`
-values:
+        yaml: new pulumi.asset.StringAsset(`values:
   stackRef:
     fn::open::pulumi-stacks:
       stacks:
