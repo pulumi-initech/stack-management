@@ -10,7 +10,7 @@ export interface StackSettingsArgs {
   driftManagement?: string;
   deleteStack?: string;
   teamAssignment?: string;
-  stackOuputs?: string[];
+  stackOutputs?: string[];
   stackTags?: string[];
 }
 
@@ -184,16 +184,16 @@ export class StackSettings extends pulumi.ComponentResource {
     }
 
     //// ESC Output advertisement
+    if(args.stackOutputs) {
+      const yaml = args
+        .stackOutputs!.map((item) => `   ${item}: \${stackRef.${stack}.${item}}`)
+        .join("\n");
 
-    const yaml = args
-      .stackOuputs!.map((item) => `   ${item}: \${stackRef.${stack}.${item}}`)
-      .join("\n");
-
-    const esc = new pulumiservice.Environment(`${name}-stack-env`, {
-      name: `${stack}-outputs`,
-      project: project,
-      organization: org,
-      yaml: new pulumi.asset.StringAsset(`
+      const esc = new pulumiservice.Environment(`${name}-stack-env`, {
+        name: `${stack}-outputs`,
+        project: project,
+        organization: org,
+        yaml: new pulumi.asset.StringAsset(`
 values:
   stackRef:
     fn::open::pulumi-stacks:
@@ -202,7 +202,8 @@ values:
           stack: ${stackFqdn}
   pulumiConfig:
     ${yaml}`),
-    });
+      });
+    }
 
     this.registerOutputs({});
   }
