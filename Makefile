@@ -1,4 +1,4 @@
-VERSION         := 0.0.17
+VERSION         := 0.0.19
 
 PACK            := stack-management
 PROJECT         := github.com/pulumi/pulumi-${PACK}
