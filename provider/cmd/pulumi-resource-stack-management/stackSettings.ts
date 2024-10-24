@@ -201,9 +201,9 @@ export class StackSettings extends pulumi.ComponentResource {
         ${stack}:
           stack: ${project}/${stack}
   pulumiConfig:
-    ${yaml}`;
+${yaml}`;
 
-      console.log(yamlDoc)
+      console.debug(yamlDoc)
 
       const esc = new pulumiservice.Environment(`${name}-stack-env`, {
         name: `${stack}-outputs`,
