@@ -5,13 +5,21 @@
         "stack-management:index:StackSettings": {
             "isComponent": true,
             "inputProperties": {
-                "ttlTime": {
+                "deploymentSettings": {
+                    "type": "object",
+                    "description": "Deployment Settings, use when running outside NPW"
+                },
+                "ttlHours": {
                     "type": "number",
                     "description": "Time to live time setting."
                 },
                 "driftManagement": {
+                    "type": "boolean",
+                    "description": "Enable drift detection."
+                },
+                "cronSchedule": {
                     "type": "string",
-                    "description": "Drift management setting for refresh or correction."
+                    "description": "Override default cron (default: 0 * * * *)"
                 },
                 "teamAssignment": {
                     "type": "string",
@@ -29,10 +37,7 @@
                     "description": "A list of output properties to expose via ESC pulumi-stacks"
                 },
                 "stackTags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
+                    "type": "object",
                     "description": "A list of tags to add to the stack"           
                 }
             },

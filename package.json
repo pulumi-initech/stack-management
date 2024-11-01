@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "install_sdk": "make install_provider && make generate && make install_nodejs_sdk"
+  },
   "devDependencies": {
     "@types/node-fetch": "^2.6.11",
     "@vercel/ncc": "^0.28.6",
