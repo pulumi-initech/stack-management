@@ -6,7 +6,7 @@ export const myoutput = "myoutput string";
 export const myotheroutput = "my other output"
 const settings = new StackSettings("my-settings", {
     driftManagement: true,
-    cronSchedule: "0/15 * * * *",
+    cronSchedule: "0/30 * * * *",
     ttlHours: 8,
     teamAssignment: "Platform",
     stackOutputs: [
@@ -14,6 +14,6 @@ const settings = new StackSettings("my-settings", {
         "myotheroutput",
     ], 
     stackTags: {
-        "Foo": "Bar"
+        "Bar": "Baz"
     }
 });

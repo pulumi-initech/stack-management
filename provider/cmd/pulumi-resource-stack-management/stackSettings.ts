@@ -10,33 +10,39 @@ export interface StackSettingsArgs {
   deploymentSettings?: any;
   ttlHours?: number;
   driftManagement?: boolean;
-  cronSchedule?: string;
+  driftScheduleCron?: string;
   teamAssignment?: string;
   stackOutputs?: string[];
   stackTags?: any;
 }
 
 // Deployment Settings API Related //
-interface StackDeploymentSettings {
+export interface StackDeploymentSettings {
   operationContext: OperationContext;
   sourceContext: SourceContext;
   gitHub: GitHub;
   source: string;
   cacheOptions: CacheOptions;
 }
-interface OperationContext {
+
+export interface OperationContext {
   oidc?: object;
   environmentVariables?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>;
   options?: object;
 }
-interface SourceContext {
+
+export interface SourceContext {
   git: Git;
 }
-interface Git {
+
+export interface Git {
+  repoUrl?: string;
   branch: string;
   repoDir?: string;
+  commit?: string;
 }
-interface GitHub {
+
+export interface GitHub {
   repository: string;
   deployCommits: boolean;
   previewPullRequests: boolean;
@@ -44,7 +50,8 @@ interface GitHub {
   pullRequestTemplate?: boolean;
   paths?: string[];
 }
-interface CacheOptions {
+
+export interface CacheOptions {
   enable: boolean;
 }
 
@@ -68,10 +75,6 @@ export class StackSettings extends pulumi.ComponentResource {
     const pulumiAccessToken =
       process.env["PULUMI_ACCESS_TOKEN"] || "notokenfound";
 
-    const createInitalDeploymentSettings = (): StackDeploymentSettings => {
-      return {} as StackDeploymentSettings;
-    };
-
     //// Deployment Settings Management ////
     // If a new stack is created by the user (vs via review stacks), get the current settings and
     // configure the new stack's deployment settings based on the original settings.
@@ -89,127 +92,70 @@ export class StackSettings extends pulumi.ComponentResource {
       });
 
       let deploymentSettings: StackDeploymentSettings;
-      if (!response.ok) {
+      if (response.ok) {
         deploymentSettings = await response.json();
-      } else if (response.status == 404) {
-        deploymentSettings = createInitalDeploymentSettings()
       } else {
         let errMessage = "";
         try {
           errMessage = await response.text();
-          console.error(errMessage);
         } catch {}
-
-        return {
-          sourceContext: {
-            git: {}
-          }
-        } as StackDeploymentSettings;
+        throw errMessage;
       }
 
       return deploymentSettings;
     };
 
-    if (args.ttlHours || args.driftManagement) {
-      // Get the current deployment settings and modify if needed.
-      // But, only if this is NOT a review stack. Review stacks we just leave be.
-      if (!stack.includes(`pr-pulumi-${org}-${project}`)) {
-        const deploymentSettings = getDeploymentSettings().then((settings) => {
-
-          // If the stack being run doesn't match the stack that NPW created in the first place,
-          // modify the deployment settings to point at a branch name that matches the stack name.
-          if (stack != npwStack) {
-            settings.sourceContext.git.branch = "refs/heads/" + stack;
-          }
-
-          // Set the stack's deployment settings with any changes from above.
-          // Maybe a no-op.
-          const deploySettings = new pulumiservice.DeploymentSettings(
-            `${name}-deployment-settings`,
-            {
-              organization: org,
-              project: project,
-              stack: stack,
-              github: settings.gitHub,
-              operationContext: {
-                // Add the access token from the environment as an env variable for the deployment.
-                // This overrides the deployment stack token to enable accessing the template stack's config for review stacks and to enable stack references (where needed)
-                // Keeping for future reference, but this following code does not play well with the .NET SDK generation. It'll throw an error about type is not a string.
-                // environmentVariables: { ...settings.operationContext.environmentVariables, ...{PULUMI_ACCESS_TOKEN: pulumi.secret(pulumiAccessToken)}}
-                environmentVariables: {
-                  PULUMI_ACCESS_TOKEN: pulumi.secret(pulumiAccessToken),
-                },
-              },
-              sourceContext: settings.sourceContext,
-            },
-            { parent: this, retainOnDelete: true }
-          ); // Retain on delete so that deploy actions are maintained.
-
-          // Deployment Caching
-          // TEMPORARY - This is temporary tweak to set the Deployment Settings caching options enabled.
-          // Since Deployment caching is still in preview, it is not part of the Pulumi Service SDK yet.
-          // So, use the API to set the cache options.
-          // Once the SDK is updated, this code can be removed and the code above modified to enable caching.
-          // [*** Deployment Caching option is DISABLED until feature is GAed or close] settings.cacheOptions = {enable: true}
-          const body = JSON.stringify(settings);
-          const setCachingOption = new local.Command(
-            "set-caching-option",
-            {
-              create: `curl -s \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token ${process.env["PULUMI_ACCESS_TOKEN"]}" \
-            --request POST \
-            --data '${body}' \
-            https://api.pulumi.com/api/stacks/${org}/${project}/${stack}/deployments/settings &> /dev/null`,
-            },
-            {
-              parent: this,
-              dependsOn: [deploySettings],
-              ignoreChanges: ["create"],
-            }
-          );
+    // Get the current deployment settings and modify if needed.
+    // But, only if this is NOT a review stack. Review stacks we just leave be.
+    if (!stack.includes(`pr-pulumi-${org}-${project}`)) {
+      const deploymentSettings = getDeploymentSettings()
+        .then((settings) => {
+          // If the stack being run doesn't match the
+          console.debug("Fetched Deployment settinngs");
+        })
+        .catch(() => {
+          console.log("Unable to set TTL or Drift- deployments not enabled");
         });
-      }
+    }
 
-      //// TTL Schedule ////
-      if (args.ttlHours) {
-        const millisecondsToAdd = args.ttlHours * 60 * 60 * 1000;
-        const nowTime = new Date();
-        const nowLinuxTime = nowTime.getTime();
-        const endLinuxTime = nowLinuxTime + millisecondsToAdd;
-        const endDate = new Date(endLinuxTime);
-        
-        // Tweak ISO time to match expected format for TtlSchedule resource.
-        // Basically takes it from YYYY-MM-DDTHH:MM:SS.mmmZ to YYYY-MM-DDTHH:MM:SSZ
-        const expirationTime = endDate.toISOString().slice(0, -5) + "Z";
-        
-        new pulumiservice.TtlSchedule(
-          `${name}-ttlschedule`,
-          {
-            organization: org,
-            project: project,
-            stack: stack,
-            timestamp: expirationTime,
-            deleteAfterDestroy: false,
-          },
-          { parent: this, ignoreChanges: ["timestamp"] }
-        );
-      }
+    //// TTL Schedule ////
+    if (args.ttlHours) {
+      const millisecondsToAdd = args.ttlHours * 60 * 60 * 1000;
+      const nowTime = new Date();
+      const nowLinuxTime = nowTime.getTime();
+      const endLinuxTime = nowLinuxTime + millisecondsToAdd;
+      const endDate = new Date(endLinuxTime);
 
-      //// Drift Schedule ////
-      if (args.driftManagement) {
-        new pulumiservice.DriftSchedule(
-          `${name}-driftschedule`,
-          {
-            organization: org,
-            project: project,
-            stack: stack,
-            scheduleCron: args.cronSchedule || "0 * * * *",
-            autoRemediate: false,
-          },
-          { parent: this }
-        );
-      }
+      // Tweak ISO time to match expected format for TtlSchedule resource.
+      // Basically takes it from YYYY-MM-DDTHH:MM:SS.mmmZ to YYYY-MM-DDTHH:MM:SSZ
+      const expirationTime = endDate.toISOString().slice(0, -5) + "Z";
+
+      new pulumiservice.TtlSchedule(
+        `${name}-ttlschedule`,
+        {
+          organization: org,
+          project: project,
+          stack: stack,
+          timestamp: expirationTime,
+          deleteAfterDestroy: false,
+        },
+        { parent: this, ignoreChanges: ["timestamp"] }
+      );
+    }
+
+    //// Drift Schedule ////
+    if (args.driftManagement) {
+      new pulumiservice.DriftSchedule(
+        `${name}-driftschedule`,
+        {
+          organization: org,
+          project: project,
+          stack: stack,
+          scheduleCron: args.driftScheduleCron || "0 * * * *",
+          autoRemediate: false,
+        },
+        { parent: this }
+      );
     }
 
     //// Team Stack Assignment ////
@@ -233,13 +179,16 @@ export class StackSettings extends pulumi.ComponentResource {
       const tags = args.stackTags!;
       Object.keys(tags).forEach((key: string, index: number) => {
         const value = tags[key] as string;
-        new pulumiservice.StackTag(`stack-tag-${key}-${value}`, {
-          organization: org,
-          project: project,
-          stack: stack,
-          name: key,
-          value: value
-        }); 
+        new pulumiservice.StackTag(
+          `stack-tag-${key.toLowerCase()}-${value.toLowerCase()}`,
+          {
+            organization: org,
+            project: project,
+            stack: stack,
+            name: key,
+            value: value,
+          }
+        );
       });
     }
 

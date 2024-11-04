@@ -17,7 +17,7 @@
                     "type": "boolean",
                     "description": "Enable drift detection."
                 },
-                "cronSchedule": {
+                "driftScheduleCron": {
                     "type": "string",
                     "description": "Override default cron (default: 0 * * * *)"
                 },
